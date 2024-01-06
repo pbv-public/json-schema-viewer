@@ -16,6 +16,7 @@
     "registry": "https://registry.npmjs.org"
   },
   "scripts": {
+    "generate-schemas": "cd ../data-extraction && yarn -s build && cd - > /dev/null && python ./scripts/collect_schemas.py ../data-extraction/build",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
