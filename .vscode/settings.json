@@ -1,0 +1,32 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.formatOnSave": true,
+  "editor.rulers": [
+    79
+  ],
+  "eslint.validate": [
+    "javascript"
+  ],
+  "files.eol": "\n",
+  "files.exclude": {
+    "node_modules": true,
+    "yarn.lock": true
+  },
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "[javascript]": {
+    "editor.formatOnSave": false,
+    "editor.tabSize": 2
+  },
+  "[sass]": {
+    "editor.defaultFormatter": "syler.sass-indented",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2
+  },
+  "standard.autoFixOnSave": true,
+  "standard.usePackageJson": true,
+  "cSpell.words": [
+  ]
+}
