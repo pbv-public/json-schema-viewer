@@ -1,9 +1,9 @@
 "use client"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import "./page.sass"
 
 import { useStorageContext } from "@/utils/storage"
-import { useRouter } from "next/navigation"
 
 export default function Home() {
   const router = useRouter()
@@ -13,6 +13,7 @@ export default function Home() {
     _setSchemaId(newSchemaId)
     updateStorage({ schemaId: newSchemaId })
   }
+  const schemaIdWithoutSlashes = schemaId.replace(/[/]/g, '~')
   return (
     <main className="home-page">
       <div className="schema-id">
@@ -21,8 +22,8 @@ export default function Home() {
           value={schemaId}
           onChange={(e) => setSchemaId(e.target.value)}
         />
-        <button type="button" onClick={() => router.push(`/schema/${schemaId}`)}>
-          Go
+        <button type="button" onClick={() => router.push(`/schema/${schemaIdWithoutSlashes}`)}>
+          Go to {schemaIdWithoutSlashes}
         </button>
       </div>
     </main>
