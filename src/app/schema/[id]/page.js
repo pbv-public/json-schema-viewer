@@ -2,7 +2,7 @@
 import './schema.sass'
 
 import { ArrowRight } from '@mui/icons-material'
-import { Breadcrumbs, Link } from '@mui/material'
+import { Breadcrumbs, Chip, Link } from '@mui/material'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback } from 'react'
 import Markdown from 'react-markdown'
@@ -65,7 +65,7 @@ export default function SchemaViewer ({ params }) {
           </Link>
         ))}
       </Breadcrumbs>
-      <Markdown className="main-description">{at.description}</Markdown>
+      <Markdown className="description">{at.description}</Markdown>
 
       <h2>Properties</h2>
       {Object.entries(directProps).map(([k, v]) => (
@@ -99,13 +99,16 @@ function Property ({ schema, fromKey, fromSchema, pathKeys, goToPropPath }) {
         <span className="property-type">{typeName}</span>
         <span className="property-name">{fromKey}</span>
         {value !== undefined && (
-          <pre className="property-const-value"> = {JSON.stringify(value)}</pre>
+          <>
+            <pre className="property-const-value"> = {JSON.stringify(value)}</pre>
+            <Chip label="const" />
+          </>
         )}
         {fromSchema.required.indexOf(fromKey) === -1
-          ? <span className="optional">optional</span>
+          ? <Chip label="optional" />
           : null}
       </div>
-      <Markdown className="property-description">{schema.description}</Markdown>
+      <Markdown className="description">{schema.description}</Markdown>
     </div>
   )
 }
@@ -127,9 +130,7 @@ function getTypeInfo (schema, fromKey) {
     const c = schema.const
     if (c !== undefined) {
       ret.value = c
-      ret.typeName = 'const ' + (Array.isArray(c)
-        ? 'array'
-        : typeof c)
+      ret.typeName = Array.isArray(c) ? 'array' : typeof c
     }
     return ret
   }
