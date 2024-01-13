@@ -1,6 +1,39 @@
 {
-  "extends": ["next/core-web-vitals", "prettier"],
+  "root": true,
+  "extends": [
+    "eslint:recommended",
+    "standard",
+    "plugin:import/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "next/core-web-vitals"
+  ],
   "env": {
     "browser": true
+  },
+  "plugins": ["import"],
+  "parser": "@babel/eslint-parser",
+  "rules": {
+    "import/order": [
+      "error",
+      {
+        "groups": ["builtin", "external", "parent", "sibling", "index"],
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        },
+        "newlines-between": "always"
+      }
+    ],
+    "no-var": "error",
+    "multiline-ternary": 1,
+    "object-shorthand": "error",
+    "import/no-unresolved": ["error", { "commonjs": true }]
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {},
+      "webpack": {}
+    }
   }
 }
