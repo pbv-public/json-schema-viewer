@@ -2,24 +2,15 @@
 import './table-of-contents.sass'
 
 import { List, ListItemButton, ListItemText } from '@mui/material'
+import { usePathname } from 'next/navigation'
 
 import { schemas } from '../generated-schemas.js'
 import { getSchemaDisplayName } from '../utils/getSchemaDisplayName.js'
-
-import { useSelectedSchemaId } from './schema/[id]/page'
 
 function cmpCaseInsensitive (a, b) {
   const aName = getSchemaDisplayName(a).toLocaleLowerCase()
   const bName = getSchemaDisplayName(b).toLocaleLowerCase()
   return aName.localeCompare(bName)
-}
-
-function schemaIdWithoutSlashes (schemaId) {
-  return schemaId.replace(/[/]/g, '~')
-}
-
-export function routeToSchema (schema) {
-  return `/schema/${schemaIdWithoutSlashes(schema.$id)}`
 }
 
 export function getAllSchemasToShow () {
@@ -28,6 +19,24 @@ export function getAllSchemasToShow () {
     x => idsToShow.has(x.$id))
   allSchemas.sort(cmpCaseInsensitive)
   return allSchemas
+}
+
+export function schemaIdWithoutSlashes (schemaId) {
+  return schemaId.replace(/[/]/g, '~')
+}
+
+export function useSelectedSchemaId () {
+  const urlPathName = usePathname()
+  const pieces = urlPathName.split('/')
+  console.log(urlPathName, pieces)
+  if (pieces[pieces.length - 2] === 'schema') {
+    const schemaIdWithoutSlashes = pieces[pieces.length - 1]
+    return schemaIdWithoutSlashes.replace(/~/g, '/')
+  }
+}
+
+export function routeToSchema (schema) {
+  return `/schema/${schemaIdWithoutSlashes(schema.$id)}`
 }
 
 export function TableOfContents () {
