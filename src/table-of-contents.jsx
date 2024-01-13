@@ -1,10 +1,12 @@
 import './table-of-contents.sass'
 
 import { List, ListItemButton, ListItemText } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
 
 import { getAllSchemasToShow, getSchemaDisplayName, routeToSchema, useSelectedSchemaId } from './utils.js'
 
 export function TableOfContents () {
+  const navigate = useNavigate()
   const selSchemaId = useSelectedSchemaId()
   console.log(selSchemaId)
   const allSchemas = getAllSchemasToShow()
@@ -28,7 +30,7 @@ export function TableOfContents () {
               {schemasInCat.map(schema => (
                 <ListItemButton
                   key={schema.$id}
-                  href={routeToSchema(schema)}
+                  onClick={() => navigate(routeToSchema(schema))}
                   className={schema.$id === selSchemaId ? 'selected' : ''}
                 >
                   <ListItemText className='schema-text'>
