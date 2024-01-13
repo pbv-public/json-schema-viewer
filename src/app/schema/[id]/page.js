@@ -3,6 +3,7 @@ import './schema.sass'
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback } from 'react'
+import Markdown from 'react-markdown'
 
 import { schemas } from '../../../generated-schemas.js'
 import { getSchemaDisplayName } from '../../../utils/getSchemaDisplayName.js'
@@ -44,7 +45,7 @@ export default function SchemaViewer ({ params }) {
           </span>
         ))}
       </h1>
-      <div className="description">{at.description}</div>
+      <Markdown className="description">{at.description}</Markdown>
 
       <h2>Properties</h2>
       {Object.entries(directProps).map(([k, v]) => (
@@ -89,7 +90,7 @@ function Property ({ schema, fromSchema, fromKey }) {
           ? <span className="optional">optional</span>
           : null}
       </div>
-      <div className="property-description">{schema.description}</div>
+      <Markdown className="property-description">{schema.description}</Markdown>
     </div>
   )
 }
