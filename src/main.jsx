@@ -1,5 +1,5 @@
 import './global.sass'
-import '@fontsource/roboto/400.css'
+import '@fontsource/roboto/latin-400.css'
 import CssBaseline from '@mui/material/CssBaseline'
 import React from 'react'
 import ReactDOM from 'react-dom/client'

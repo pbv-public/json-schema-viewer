@@ -8,7 +8,6 @@ import { getAllSchemasToShow, getSchemaDisplayName, routeToSchema, useSelectedSc
 export function TableOfContents () {
   const navigate = useNavigate()
   const selSchemaId = useSelectedSchemaId()
-  console.log(selSchemaId)
   const allSchemas = getAllSchemasToShow()
   const schemasByCategory = {}
   for (const schema of allSchemas) {
