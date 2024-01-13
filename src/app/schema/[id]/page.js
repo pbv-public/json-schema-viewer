@@ -90,7 +90,7 @@ function Property ({ className, schema, fromKey, fromSchema, pathKeys, goToPropP
       goToPropPath(pathKeys.concat([fromKey]))
     }
   }, [canClickInto, fromKey, goToPropPath, pathKeys])
-  const { typeName, value } = getTypeInfo(schema, fromKey)
+  const { min, max, typeName, value } = getTypeInfo(schema, fromKey)
   return (
     <div className={`property ${className}`}>
       <div
@@ -105,13 +105,28 @@ function Property ({ className, schema, fromKey, fromSchema, pathKeys, goToPropP
             <Chip label="const" />
           </>
         )}
-        {fromSchema.required.indexOf(fromKey) === -1
+        {(fromSchema.required?.indexOf(fromKey) ?? -1) === -1
           ? <Chip label="optional" />
           : null}
+        <MinMaxChip min={min} max={max} />
       </div>
       <Markdown className="description">{schema.description}</Markdown>
     </div>
   )
+}
+
+function MinMaxChip ({ min, max }) {
+  let text
+  if (min !== undefined && max !== undefined) {
+    text = `must be in the range [${min}, ${max}]`
+  } else if (min !== undefined) {
+    text = `must be >= ${min}`
+  } else if (max !== undefined) {
+    text = `must be <= ${min}`
+  }
+  if (text) {
+    return <Chip color="warning" label={text} />
+  }
 }
 
 function getTypeInfo (schema, fromKey) {
@@ -123,6 +138,8 @@ function getTypeInfo (schema, fromKey) {
   } else {
     const name = getSchemaDisplayName(schema) ?? schema.type
     const ret = {
+      min: schema.minimum,
+      max: schema.maximum,
       isPrimitiveType: true,
       schema,
       typeName: schema.type,
@@ -138,16 +155,34 @@ function getTypeInfo (schema, fromKey) {
 }
 
 function getArrayType (schema, fromKey) {
-  let numArrayWraps = 0
+  const arrayWraps = []
   while (schema.type === 'array') {
+    const { maxItems: max, minItems: min } = schema
     schema = schema.items
-    numArrayWraps += 1
+    arrayWraps.push({ min, max })
   }
   let { typeName } = getTypeInfo(schema, fromKey)
-  let name = typeName
-  for (let i = 0; i < numArrayWraps; i++) {
+  let extra = ''
+  let hasMinOrMax = false
+  for (const { min, max } of arrayWraps) {
     typeName = `Array<${typeName}>`
-    name += '[]'
+
+    if (max === min && min !== undefined) {
+      extra += `[${min}]`
+      hasMinOrMax = true
+    } else if (max !== undefined) {
+      extra += `[0,${max}]`
+      hasMinOrMax = true
+    } else if (min !== undefined) {
+      extra += `[${min}+]`
+      hasMinOrMax = true
+    } else {
+      extra += '[]'
+    }
   }
-  return { schema, typeName, name }
+  const name = typeName + extra
+  if (hasMinOrMax) {
+    typeName += extra
+  }
+  return { name, schema, typeName }
 }
