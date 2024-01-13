@@ -142,7 +142,7 @@ function getTypeInfo (schema, fromKey) {
       max: schema.maximum,
       isPrimitiveType: true,
       schema,
-      typeName: schema.type,
+      typeName: schema.type === 'number' ? 'double' : schema.type,
       name
     }
     const c = schema.const
