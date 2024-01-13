@@ -1,6 +1,8 @@
 'use client'
 import './schema.sass'
 
+import { ArrowRight } from '@mui/icons-material'
+import { Breadcrumbs, Link } from '@mui/material'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback } from 'react'
 import Markdown from 'react-markdown'
@@ -50,17 +52,19 @@ export default function SchemaViewer ({ params }) {
 
   return (
     <div className="json-schema-viewer">
-      <div className='breadcrumbs'>
+      <Breadcrumbs separator={<ArrowRight />}>
         {pathNames.map((x, i) => (
-          <span
+          <Link
             key={i}
-            className="path-part"
+            className={`path-part clickable${i === pathNames.length - 1 ? ' last-item' : ''}`}
+            underline="hover"
+            color={i === pathNames.length - 1 ? undefined : 'inherit'}
             onClick={() => goToPropPath(pathKeys.slice(0, i))}
           >
             {x}
-          </span>
+          </Link>
         ))}
-      </div>
+      </Breadcrumbs>
       <Markdown className="main-description">{at.description}</Markdown>
 
       <h2>Properties</h2>
