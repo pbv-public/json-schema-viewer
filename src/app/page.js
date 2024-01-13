@@ -1,55 +1,22 @@
 'use client'
-import './page.sass'
 
-import { schemas } from '../generated-schemas.js'
-import { getSchemaDisplayName } from '../utils/getSchemaDisplayName.js'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
-function cmpCaseInsensitive (a, b) {
-  const aName = getSchemaDisplayName(a).toLocaleLowerCase()
-  const bName = getSchemaDisplayName(b).toLocaleLowerCase()
-  return aName.localeCompare(bName)
-}
-
-function schemaIdWithoutSlashes (schemaId) {
-  return schemaId.replace(/[/]/g, '~')
-}
+import { getAllSchemasToShow, routeToSchema } from './table-of-contents'
 
 export default function Home () {
-  const idsToShow = new Set(schemas.key_schema_ids)
-  const allSchemas = Object.values(schemas.schemas).filter(
-    x => idsToShow.has(x.$id))
-  allSchemas.sort(cmpCaseInsensitive)
+  const router = useRouter()
 
-  const schemasByCategory = {}
-  for (const schema of allSchemas) {
-    const category = schema.$id.split('/').reduce(
-      (prev, cur) => prev || cur)
-    if (!schemasByCategory[category]) {
-      schemasByCategory[category] = []
+  useEffect(() => {
+    const allSchemas = getAllSchemasToShow()
+    let defaultSchema = allSchemas[0]
+    for (const schema of allSchemas) {
+      if (schema.$id.indexOf('/game') !== -1) {
+        defaultSchema = schema
+        break
+      }
     }
-    schemasByCategory[category].push(schema)
-  }
-
-  return (
-    <main className="home-page">
-      <div className="schemas">
-        {Object.entries(schemasByCategory).map(([category, schemasInCat]) => (
-          <div className="schemas-for-category" key={category}>
-            <h1>{category}</h1>
-            <div className="schemas">
-              <ul>
-                {schemasInCat.map(schema => (
-                  <li key={schema.$id}>
-                    <a href={`/schema/${schemaIdWithoutSlashes(schema.$id)}`}>
-                      {getSchemaDisplayName(schema)}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        ))}
-      </div>
-    </main>
-  )
+    router.push(routeToSchema(defaultSchema), undefined, { shallow: true })
+  }, [router])
 }

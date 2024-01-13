@@ -40,8 +40,7 @@ export default function SchemaViewer ({ params }) {
 
   return (
     <div className="json-schema-viewer">
-      <h1>
-        <button onClick={() => router.push('/')}>&lt; Back</button>
+      <div className='breadcrumbs'>
         {pathNames.map((x, i) => (
           <span
             key={i}
@@ -51,8 +50,8 @@ export default function SchemaViewer ({ params }) {
             {x}
           </span>
         ))}
-      </h1>
-      <Markdown className="description">{at.description}</Markdown>
+      </div>
+      <Markdown className="main-description">{at.description}</Markdown>
 
       <h2>Properties</h2>
       {Object.entries(directProps).map(([k, v]) => (

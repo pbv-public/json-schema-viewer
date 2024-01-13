@@ -1,19 +1,26 @@
-import { Inter } from "next/font/google"
-import "normalize.css/normalize.css"
-import "./global.sass"
+import { Inter } from 'next/font/google'
+import 'normalize.css/normalize.css'
+import './global.sass'
 
-import { StorageProvider } from "@/utils/storage"
+import { StorageProvider } from '../utils/storage.js'
 
-const inter = Inter({ subsets: ["latin"] })
+import { TableOfContents } from './table-of-contents.js'
 
-export const metadata = { title: "JSON Schema Viewer" }
+const inter = Inter({ subsets: ['latin'] })
 
-export default function RootLayout({ children }) {
+export const metadata = { title: 'JSON Schema Viewer' }
+
+export default function RootLayout ({ children }) {
   return (
     <html lang="en">
       <body className={`${inter.className}`}>
         <StorageProvider>
-          <div className="root-frame">{children}</div>
+          <div className="root-frame">
+            <TableOfContents />
+            <main className="main-content">
+              {children}
+            </main>
+          </div>
         </StorageProvider>
       </body>
     </html>
