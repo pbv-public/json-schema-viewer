@@ -65,20 +65,22 @@ export default function SchemaViewer ({ params }) {
           </Link>
         ))}
       </Breadcrumbs>
-      <Markdown className="description">{at.description}</Markdown>
+      <div className='schema-portion'>
+        <Markdown className="description">{at.description}</Markdown>
 
-      <h2>Properties</h2>
-      {Object.entries(directProps).map(([k, v], i) => (
-        <Property
-          key={k}
-          className={i === 0 ? 'first' : ''}
-          schema={v}
-          fromKey={k}
-          fromSchema={at}
-          pathKeys={pathKeys}
-          goToPropPath={goToPropPath}
-        />
-      ))}
+        <h2>Properties</h2>
+        {Object.entries(directProps).map(([k, v], i) => (
+          <Property
+            key={k}
+            className={i === 0 ? 'first' : ''}
+            schema={v}
+            fromKey={k}
+            fromSchema={at}
+            pathKeys={pathKeys}
+            goToPropPath={goToPropPath}
+          />
+        ))}
+      </div>
     </div>
   )
 }
@@ -125,7 +127,7 @@ function MinMaxChip ({ min, max }) {
     text = `must be <= ${min}`
   }
   if (text) {
-    return <Chip color="warning" label={text} />
+    return <div className='min-max'><Chip color="warning" label={text} /></div>
   }
 }
 

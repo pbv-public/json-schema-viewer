@@ -1,29 +1,39 @@
 .json-schema-viewer
-  padding-top: 0.5rem
-  .MuiBreadcrumbs-li a.last-item
-    font-weight: bold
-  h2
-    margin-bottom: 0
-  .property
-    margin-left: 2rem
-    margin-top: 2rem
-    &.first
-      margin-top: 0
-    .property-definition
-      .property-const-value
-        display: inline-block
-        margin: 0
-      .property-name, .property-type
-        font-family: monospace
-        line-height: 1rem
-      .property-type
-        color: #00885A
-      .property-name
-        color: #08F
-        font-size: 1.2rem
-        font-weight: bold
-        margin-left: 0.5rem
-      .MuiChip-root
-        margin-left: 0.5rem
-  div.description > p:first-child
+  .MuiBreadcrumbs-ol
+    background-color: #EEE
+    border-bottom: 1px solid black
+    padding: 0.5rem 1rem
+    .MuiBreadcrumbs-li a.last-item
+      font-weight: bold
+  .schema-portion
+    padding: 0 1rem
+    h2
+      font-size: 1.25rem
+      margin-bottom: -0.5rem
+    .property
+      margin-left: 2rem
+      margin-top: 2rem
+      &.first
         margin-top: 0
+      .property-definition
+        .property-const-value
+          display: inline-block
+          margin: 0
+        .property-name, .property-type
+          font-family: monospace
+          line-height: 1rem
+        .property-type
+          color: #00885A
+        .property-name
+          color: #08F
+          font-size: 1.2rem
+          font-weight: bold
+          margin-left: 0.5rem
+        .MuiChip-root
+          height: 1.2rem
+          margin-left: 0.5rem
+        .min-max
+          .MuiChip-root
+            margin-left: 0
+    div.description > p:first-child
+            margin-top: 0
