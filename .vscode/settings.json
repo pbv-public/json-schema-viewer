@@ -7,7 +7,8 @@
     79
   ],
   "eslint.validate": [
-    "javascript"
+    "javascript",
+    "javascriptreact"
   ],
   "files.eol": "\n",
   "files.exclude": {
@@ -27,6 +28,10 @@
   },
   "standard.autoFixOnSave": true,
   "standard.usePackageJson": true,
+  "standard.validate": [
+    "javascript",
+    "javascriptreact",
+  ],
   "cSpell.words": [
     "fontsource",
     "roboto"

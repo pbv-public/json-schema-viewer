@@ -19,10 +19,10 @@ export function TableOfContents () {
   }
 
   return (
-    <div className="table-of-contents">
-      <div className="schemas">
+    <div className='table-of-contents'>
+      <div className='schemas'>
         {Object.entries(schemasByCategory).map(([category, schemasInCat]) => (
-          <div className="schemas-for-category" key={category}>
+          <div className='schemas-for-category' key={category}>
             <h1>{category}</h1>
             <List>
               {schemasInCat.map(schema => (
@@ -31,7 +31,7 @@ export function TableOfContents () {
                   href={routeToSchema(schema)}
                   className={schema.$id === selSchemaId ? 'selected' : ''}
                 >
-                  <ListItemText className="schema-text">
+                  <ListItemText className='schema-text'>
                     {getSchemaDisplayName(schema)}
                   </ListItemText>
                 </ListItemButton>

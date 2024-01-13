@@ -37,13 +37,13 @@ export function JSONSchemaViewer () {
   const directProps = at.properties ?? {} // omitted if `at` is a primitive type
 
   return (
-    <div className="json-schema-viewer">
+    <div className='json-schema-viewer'>
       <Breadcrumbs separator={<ArrowRight />}>
         {pathNames.map((x, i) => (
           <Link
             key={i}
             className={`path-part clickable${i === pathNames.length - 1 ? ' last-item' : ''}`}
-            underline="hover"
+            underline='hover'
             color={i === pathNames.length - 1 ? undefined : 'inherit'}
             onClick={() => goToPropPath(pathKeys.slice(0, i))}
           >
@@ -52,7 +52,7 @@ export function JSONSchemaViewer () {
         ))}
       </Breadcrumbs>
       <div className='schema-portion'>
-        <Markdown className="description">{at.description}</Markdown>
+        <Markdown className='description'>{at.description}</Markdown>
 
         <h2>Properties</h2>
         {Object.entries(directProps).map(([k, v], i) => (
@@ -85,20 +85,20 @@ function Property ({ className, schema, fromKey, fromSchema, pathKeys, goToPropP
         className={`property-definition${canClickInto ? ' clickable' : ''}`}
         onClick={onClick}
       >
-        <span className="property-type">{typeName}</span>
-        <span className="property-name">{fromKey}</span>
+        <span className='property-type'>{typeName}</span>
+        <span className='property-name'>{fromKey}</span>
         {value !== undefined && (
           <>
-            <pre className="property-const-value"> = {JSON.stringify(value)}</pre>
-            <Chip label="const" />
+            <pre className='property-const-value'> = {JSON.stringify(value)}</pre>
+            <Chip label='const' />
           </>
         )}
         {(fromSchema.required?.indexOf(fromKey) ?? -1) === -1
-          ? <Chip label="optional" />
+          ? <Chip label='optional' />
           : null}
         <MinMaxChip min={min} max={max} />
       </div>
-      <Markdown className="description">{schema.description}</Markdown>
+      <Markdown className='description'>{schema.description}</Markdown>
     </div>
   )
 }
@@ -113,7 +113,7 @@ function MinMaxChip ({ min, max }) {
     text = `must be <= ${min}`
   }
   if (text) {
-    return <div className='min-max'><Chip color="warning" label={text} /></div>
+    return <div className='min-max'><Chip color='warning' label={text} /></div>
   }
 }
 

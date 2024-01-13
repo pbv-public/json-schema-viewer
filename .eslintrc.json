@@ -6,13 +6,15 @@
     "plugin:react/jsx-runtime",
     "plugin:react-hooks/recommended",
     "standard",
+    "standard-jsx",
+    "standard-react",
     "plugin:import/recommended",
     "plugin:import/errors",
     "plugin:import/warnings"
   ],
   "env": {
     "browser": true,
-    "es2020": true
+    "es2023": true
   },
   "ignorePatterns": ["dist"],
   "plugins": ["import", "react-refresh"],
@@ -40,6 +42,7 @@
     "multiline-ternary": 1,
     "object-shorthand": "error",
     "react/prop-types": "off",
+    "react/react-in-jsx-scope": "off",
     "react-refresh/only-export-components": [
       "warn",
       { "allowConstantExport": true }
@@ -47,7 +50,7 @@
     "import/no-unresolved": ["error", { "commonjs": true }]
   },
   "settings": {
-    "react": { "version": "18.2" },
+    "react": { "version": "detect" },
     "import/resolver": {
       "node": {},
       "webpack": {}
