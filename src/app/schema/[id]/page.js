@@ -25,9 +25,16 @@ export default function SchemaViewer ({ params }) {
   // find the properties at this path, and the names of the path segments to it
   let at = schema
   const pathNames = [getTypeInfo(at).name]
+  function goPastArrays () {
+    while (at.type === 'array') {
+      at = at.items
+    }
+  }
   for (const curPiece of pathKeys) {
+    goPastArrays()
     at = at.properties[curPiece]
     pathNames.push(getTypeInfo(at, curPiece).name)
+    goPastArrays()
   }
   const directProps = at.properties ?? {} // omitted if `at` is a primitive type
 
@@ -127,14 +134,10 @@ function getArrayType (schema, fromKey) {
     numArrayWraps += 1
   }
   let { typeName } = getTypeInfo(schema, fromKey)
-  let name = typeName + ' '
+  let name = typeName
   for (let i = 0; i < numArrayWraps; i++) {
     typeName = `Array<${typeName}>`
-    if (i === numArrayWraps - 1) {
-      name += 'items'
-    } else {
-      name += 'sub-'
-    }
+    name += '[]'
   }
   return { schema, typeName, name }
 }
