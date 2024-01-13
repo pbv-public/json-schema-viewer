@@ -1,28 +1,24 @@
-'use client'
 import './schema.sass'
 
 import { ArrowRight } from '@mui/icons-material'
 import { Breadcrumbs, Chip, Link } from '@mui/material'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback } from 'react'
 import Markdown from 'react-markdown'
+import { useParams, useSearchParams } from 'react-router-dom'
 
-import { schemas } from '../../../generated-schemas.js'
-import { getSchemaDisplayName } from '../../../utils/getSchemaDisplayName.js'
+import { schemas } from './generated-schemas.js'
+import { getSchemaDisplayName } from './utils.js'
 
-export default function SchemaViewer ({ params }) {
-  const urlPathName = usePathname()
-  const router = useRouter()
-  const schemaId = params.id.replace(/~/g, '/')
+export function JSONSchemaViewer () {
+  const schemaId = useParams().schemaId.replace(/~/g, '/')
   const schema = schemas.schemas[schemaId]
 
-  const searchParams = useSearchParams()
-  const pathStr = searchParams.get('p') ?? '' // empty=root, x.y.z = child
+  const [searchParams, setSearchParams] = useSearchParams()
+  const pathStr = searchParams.p ?? '' // empty=root, x.y.z = child
   const pathKeys = pathStr ? pathStr.split('.') : []
-
   const goToPropPath = useCallback(pathKeys => {
-    router.push(urlPathName + '?p=' + pathKeys.join('.'))
-  }, [router, urlPathName])
+    setSearchParams({ p: pathKeys.join('.') })
+  }, [setSearchParams])
 
   // find the properties at this path, and the names of the path segments to it
   let at = schema

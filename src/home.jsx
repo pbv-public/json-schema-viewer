@@ -1,3 +1,3 @@
-export default function NotFound () {
+export default function Home () {
   return <div style={{ margin: '0.5rem 1rem' }}>Pick a schema to explore!</div>
 }

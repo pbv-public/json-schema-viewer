@@ -28,5 +28,7 @@
   "standard.autoFixOnSave": true,
   "standard.usePackageJson": true,
   "cSpell.words": [
+    "fontsource",
+    "roboto"
   ]
 }
