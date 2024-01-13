@@ -68,9 +68,10 @@ export default function SchemaViewer ({ params }) {
       <Markdown className="description">{at.description}</Markdown>
 
       <h2>Properties</h2>
-      {Object.entries(directProps).map(([k, v]) => (
+      {Object.entries(directProps).map(([k, v], i) => (
         <Property
           key={k}
+          className={i === 0 ? 'first' : ''}
           schema={v}
           fromKey={k}
           fromSchema={at}
@@ -82,7 +83,7 @@ export default function SchemaViewer ({ params }) {
   )
 }
 
-function Property ({ schema, fromKey, fromSchema, pathKeys, goToPropPath }) {
+function Property ({ className, schema, fromKey, fromSchema, pathKeys, goToPropPath }) {
   const canClickInto = !getTypeInfo(schema, fromKey).isPrimitiveType
   const onClick = useCallback(() => {
     if (canClickInto) {
@@ -91,7 +92,7 @@ function Property ({ schema, fromKey, fromSchema, pathKeys, goToPropPath }) {
   }, [canClickInto, fromKey, goToPropPath, pathKeys])
   const { typeName, value } = getTypeInfo(schema, fromKey)
   return (
-    <div className='property'>
+    <div className={`property ${className}`}>
       <div
         className={`property-definition${canClickInto ? ' clickable' : ''}`}
         onClick={onClick}
