@@ -18,28 +18,33 @@ export function TableOfContents () {
     }
     schemasByCategory[category].push(schema)
   }
+  const categories = Object.keys(schemasByCategory)
+  categories.sort()
 
   return (
     <div className={`table-of-contents${selSchemaId ? '' : ' need-to-pick'}`}>
       <div className='schemas'>
-        {Object.entries(schemasByCategory).map(([category, schemasInCat]) => (
-          <div className='schemas-for-category' key={category}>
-            <h1>{category}</h1>
-            <List>
-              {schemasInCat.map(schema => (
-                <ListItemButton
-                  key={schema.$id}
-                  onClick={() => navigate(routeToSchema(schema))}
-                  className={schema.$id === selSchemaId ? 'selected' : ''}
-                >
-                  <ListItemText className='schema-text'>
-                    {getSchemaDisplayName(schema)}
-                  </ListItemText>
-                </ListItemButton>
-              ))}
-            </List>
-          </div>
-        ))}
+        {categories.map(category => {
+          const schemasInCat = schemasByCategory[category]
+          return (
+            <div className='schemas-for-category' key={category}>
+              <h1>{category}</h1>
+              <List>
+                {schemasInCat.map(schema => (
+                  <ListItemButton
+                    key={schema.$id}
+                    onClick={() => navigate(routeToSchema(schema))}
+                    className={schema.$id === selSchemaId ? 'selected' : ''}
+                  >
+                    <ListItemText className='schema-text'>
+                      {getSchemaDisplayName(schema)}
+                    </ListItemText>
+                  </ListItemButton>
+                ))}
+              </List>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
