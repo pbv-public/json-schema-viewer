@@ -56,7 +56,7 @@ export default function SchemaViewer ({ params }) {
 
       <h2>Properties</h2>
       {Object.entries(directProps).map(([k, v]) => (
-        <ClickableProperty
+        <Property
           key={k}
           schema={v}
           fromKey={k}
@@ -69,25 +69,20 @@ export default function SchemaViewer ({ params }) {
   )
 }
 
-function ClickableProperty ({ schema, fromKey, fromSchema, pathKeys, goToPropPath }) {
-  const prop = <Property schema={schema} fromKey={fromKey} fromSchema={fromSchema} />
-  if (getTypeInfo(schema, fromKey).isPrimitiveType) {
-    return prop
-  }
-  return (
-    <div
-      className="clickable-property"
-      onClick={() => goToPropPath(pathKeys.concat([fromKey]))}>
-      {prop}
-    </div>
-  )
-}
-
-function Property ({ schema, fromSchema, fromKey }) {
+function Property ({ schema, fromKey, fromSchema, pathKeys, goToPropPath }) {
+  const canClickInto = !getTypeInfo(schema, fromKey).isPrimitiveType
+  const onClick = useCallback(() => {
+    if (canClickInto) {
+      goToPropPath(pathKeys.concat([fromKey]))
+    }
+  }, [canClickInto, fromKey, goToPropPath, pathKeys])
   const { typeName, value } = getTypeInfo(schema, fromKey)
   return (
-    <div className="property">
-      <div className="property-definition">
+    <div className='property'>
+      <div
+        className={`property-definition${canClickInto ? ' clickable' : ''}`}
+        onClick={onClick}
+      >
         <span className="property-type">{typeName}</span>
         <span className="property-name">{fromKey}</span>
         {value !== undefined && (
