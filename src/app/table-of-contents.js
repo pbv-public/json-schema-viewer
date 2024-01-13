@@ -1,8 +1,12 @@
 'use client'
 import './table-of-contents.sass'
 
+import { List, ListItemButton, ListItemText } from '@mui/material'
+
 import { schemas } from '../generated-schemas.js'
 import { getSchemaDisplayName } from '../utils/getSchemaDisplayName.js'
+
+import { useSelectedSchemaId } from './schema/[id]/page'
 
 function cmpCaseInsensitive (a, b) {
   const aName = getSchemaDisplayName(a).toLocaleLowerCase()
@@ -27,6 +31,8 @@ export function getAllSchemasToShow () {
 }
 
 export function TableOfContents () {
+  const selSchemaId = useSelectedSchemaId()
+  console.log(selSchemaId)
   const allSchemas = getAllSchemasToShow()
   const schemasByCategory = {}
   for (const schema of allSchemas) {
@@ -44,17 +50,19 @@ export function TableOfContents () {
         {Object.entries(schemasByCategory).map(([category, schemasInCat]) => (
           <div className="schemas-for-category" key={category}>
             <h1>{category}</h1>
-            <div className="schemas">
-              <ul>
-                {schemasInCat.map(schema => (
-                  <li key={schema.$id}>
-                    <a href={routeToSchema(schema)}>
-                      {getSchemaDisplayName(schema)}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <List>
+              {schemasInCat.map(schema => (
+                <ListItemButton
+                  key={schema.$id}
+                  href={routeToSchema(schema)}
+                  className={schema.$id === selSchemaId ? 'selected' : ''}
+                >
+                  <ListItemText className="schema-text">
+                    {getSchemaDisplayName(schema)}
+                  </ListItemText>
+                </ListItemButton>
+              ))}
+            </List>
           </div>
         ))}
       </div>

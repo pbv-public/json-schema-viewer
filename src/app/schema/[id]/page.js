@@ -8,6 +8,16 @@ import Markdown from 'react-markdown'
 import { schemas } from '../../../generated-schemas.js'
 import { getSchemaDisplayName } from '../../../utils/getSchemaDisplayName.js'
 
+export function useSelectedSchemaId () {
+  const urlPathName = usePathname()
+  const pieces = urlPathName.split('/')
+  console.log(urlPathName, pieces)
+  if (pieces[pieces.length - 2] === 'schema') {
+    const schemaIdWithoutSlashes = pieces[pieces.length - 1]
+    return schemaIdWithoutSlashes.replace(/~/g, '/')
+  }
+}
+
 export default function SchemaViewer ({ params }) {
   const urlPathName = usePathname()
   const router = useRouter()

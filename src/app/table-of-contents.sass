@@ -1,9 +1,18 @@
 .table-of-contents
-    .schemas-for-category:not(:first-child)
-        margin-top: 1rem
-    h1
-        margin: 0
-    ul
-        margin: 0
-    li
-        line-height: 1.5rem
+    .schemas-for-category
+        &:not(:first-child)
+            margin-top: 1rem
+        h1
+            color: #AAA
+            font-variant: small-caps
+            line-height: 1
+            margin: 0
+        .MuiListItemButton-root
+            padding-top: 3px
+            padding-bottom: 3px
+        .schema-text span
+            line-height: 1
+        .selected
+            background-color: #FFA
+            .schema-text span
+                font-weight: bold
