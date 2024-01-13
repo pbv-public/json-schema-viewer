@@ -1,9 +1,8 @@
-"use client"
-import { useRouter } from "next/navigation"
-import "./page.sass"
+'use client'
+import './page.sass'
 
-import { schemas } from "@/generated-schemas"
-import { getSchemaDisplayName } from "@/utils/getSchemaDisplayName"
+import { schemas } from '../generated-schemas.js'
+import { getSchemaDisplayName } from '../utils/getSchemaDisplayName.js'
 
 function cmpCaseInsensitive (a, b) {
   const aName = getSchemaDisplayName(a).toLocaleLowerCase()
@@ -11,12 +10,11 @@ function cmpCaseInsensitive (a, b) {
   return aName.localeCompare(bName)
 }
 
-function schemaIdWithoutSlashes(schemaId) {
+function schemaIdWithoutSlashes (schemaId) {
   return schemaId.replace(/[/]/g, '~')
 }
 
-export default function Home() {
-  const router = useRouter()
+export default function Home () {
   const idsToShow = new Set(schemas.key_schema_ids)
   const allSchemas = Object.values(schemas.schemas).filter(
     x => idsToShow.has(x.$id))
@@ -25,7 +23,7 @@ export default function Home() {
   const schemasByCategory = {}
   for (const schema of allSchemas) {
     const category = schema.$id.split('/').reduce(
-      (prev, cur) => prev ? prev : cur)
+      (prev, cur) => prev || cur)
     if (!schemasByCategory[category]) {
       schemasByCategory[category] = []
     }
