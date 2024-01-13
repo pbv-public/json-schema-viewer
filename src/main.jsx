@@ -22,6 +22,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             element: <JSONSchemaViewer />
           },
           {
+            path: '',
+            element: <Home />
+          },
+          {
             path: '*',
             element: <Home />
           }
