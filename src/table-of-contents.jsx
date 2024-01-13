@@ -20,7 +20,7 @@ export function TableOfContents () {
   }
 
   return (
-    <div className='table-of-contents'>
+    <div className={`table-of-contents${selSchemaId ? '' : ' need-to-pick'}`}>
       <div className='schemas'>
         {Object.entries(schemasByCategory).map(([category, schemasInCat]) => (
           <div className='schemas-for-category' key={category}>

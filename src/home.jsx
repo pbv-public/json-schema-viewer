@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { redirect, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 export default function Home () {
   const loc = useLocation()
