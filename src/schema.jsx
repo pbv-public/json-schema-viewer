@@ -14,7 +14,7 @@ export function JSONSchemaViewer () {
   const schema = schemas.schemas[schemaId]
 
   const [searchParams, setSearchParams] = useSearchParams()
-  const pathStr = searchParams.p ?? '' // empty=root, x.y.z = child
+  const pathStr = searchParams.get('p') ?? '' // empty=root, x.y.z = child
   const pathKeys = pathStr ? pathStr.split('.') : []
   const goToPropPath = useCallback(pathKeys => {
     setSearchParams({ p: pathKeys.join('.') })
@@ -53,21 +53,34 @@ export function JSONSchemaViewer () {
       </Breadcrumbs>
       <div className='schema-portion'>
         <Markdown className='description'>{at.description}</Markdown>
-
-        <h2>Properties</h2>
-        {Object.entries(directProps).map(([k, v], i) => (
-          <Property
-            key={k}
-            className={i === 0 ? 'first' : ''}
-            schema={v}
-            fromKey={k}
-            fromSchema={at}
-            pathKeys={pathKeys}
-            goToPropPath={goToPropPath}
-          />
-        ))}
+        <Properties
+          props={directProps}
+          at={at} pathKeys={pathKeys} goToPropPath={goToPropPath}
+        />
       </div>
     </div>
+  )
+}
+
+function Properties ({ props, at, pathKeys, goToPropPath }) {
+  if (!Object.keys(props).length) {
+    return
+  }
+  return (
+    <>
+      <h2>Properties</h2>
+      {Object.entries(props).map(([k, v], i) => (
+        <Property
+          key={k}
+          className={i === 0 ? 'first' : ''}
+          schema={v}
+          fromKey={k}
+          fromSchema={at}
+          pathKeys={pathKeys}
+          goToPropPath={goToPropPath}
+        />
+      ))}
+    </>
   )
 }
 
