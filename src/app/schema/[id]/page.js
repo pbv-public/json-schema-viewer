@@ -2,28 +2,31 @@
 import './schema.sass'
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useCallback } from 'react'
 
 import { schemas } from '../../../generated-schemas.js'
 import { getSchemaDisplayName } from '../../../utils/getSchemaDisplayName.js'
 
 export default function SchemaViewer ({ params }) {
+  const urlPathName = usePathname()
   const router = useRouter()
   const schemaId = params.id.replace(/~/g, '/')
   const schema = schemas.schemas[schemaId]
 
   const searchParams = useSearchParams()
   const pathStr = searchParams.get('p') ?? '' // empty=root, x.y.z = child
-  const pathPieces = pathStr
-    ? pathStr.split('.')
-    : []
+  const pathKeys = pathStr ? pathStr.split('.') : []
+
+  const goToPropPath = useCallback(pathKeys => {
+    router.push(urlPathName + '?p=' + pathKeys.join('.'))
+  }, [router, urlPathName])
 
   // find the properties at this path, and the names of the path segments to it
-  const pathNames = []
   let at = schema
-  for (const curPiece of pathPieces) {
+  const pathNames = [getTypeInfo(at).name]
+  for (const curPiece of pathKeys) {
     at = at.properties[curPiece]
-    const { name } = getTypeInfo(at, curPiece)
-    pathNames.push(name)
+    pathNames.push(getTypeInfo(at, curPiece).name)
   }
   const directProps = at.properties ?? {} // omitted if `at` is a primitive type
 
@@ -31,31 +34,42 @@ export default function SchemaViewer ({ params }) {
     <div className="json-schema-viewer">
       <h1>
         <button onClick={() => router.push('/')}>&lt; Back</button>
-        {pathNames.map((x, i) => (<span className="path-part" key={i}>{x}</span>))}
+        {pathNames.map((x, i) => (
+          <span
+            key={i}
+            className="path-part"
+            onClick={() => goToPropPath(pathKeys.slice(0, i))}
+          >
+            {x}
+          </span>
+        ))}
       </h1>
       <div className="description">{at.description}</div>
 
       <h2>Properties</h2>
       {Object.entries(directProps).map(([k, v]) => (
-        <ClickableProperty key={k} schema={v} fromKey={k} fromSchema={at} pathNames={pathNames} />
+        <ClickableProperty
+          key={k}
+          schema={v}
+          fromKey={k}
+          fromSchema={at}
+          pathKeys={pathKeys}
+          goToPropPath={goToPropPath}
+        />
       ))}
     </div>
   )
 }
 
-function ClickableProperty ({ schema, fromKey, fromSchema, pathNames }) {
-  const urlPathName = usePathname()
-  const router = useRouter()
+function ClickableProperty ({ schema, fromKey, fromSchema, pathKeys, goToPropPath }) {
   const prop = <Property schema={schema} fromKey={fromKey} fromSchema={fromSchema} />
-  if (!getTypeInfo(schema, fromKey).isPrimitiveType) {
+  if (getTypeInfo(schema, fromKey).isPrimitiveType) {
     return prop
   }
   return (
     <div
       className="clickable-property"
-      onClick={() => {
-        router.push(urlPathName + '?p=' + pathNames.concat([fromKey]).join('.'))
-      }}>
+      onClick={() => goToPropPath(pathKeys.concat([fromKey]))}>
       {prop}
     </div>
   )
