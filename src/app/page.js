@@ -1,30 +1,56 @@
 "use client"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
 import "./page.sass"
 
-import { useStorageContext } from "@/utils/storage"
+import { schemas } from "@/generated-schemas"
+import { getSchemaDisplayName } from "@/utils/getSchemaDisplayName"
+
+function cmpCaseInsensitive (a, b) {
+  const aName = getSchemaDisplayName(a).toLocaleLowerCase()
+  const bName = getSchemaDisplayName(b).toLocaleLowerCase()
+  return aName.localeCompare(bName)
+}
+
+function schemaIdWithoutSlashes(schemaId) {
+  return schemaId.replace(/[/]/g, '~')
+}
 
 export default function Home() {
   const router = useRouter()
-  const { updateStorage, ...originalStorage } = useStorageContext()
-  const [schemaId, _setSchemaId] = useState(originalStorage.schemaId ?? "/derived/game")
-  function setSchemaId(newSchemaId) {
-    _setSchemaId(newSchemaId)
-    updateStorage({ schemaId: newSchemaId })
+  const idsToShow = new Set(schemas.key_schema_ids)
+  const allSchemas = Object.values(schemas.schemas).filter(
+    x => idsToShow.has(x.$id))
+  allSchemas.sort(cmpCaseInsensitive)
+
+  const schemasByCategory = {}
+  for (const schema of allSchemas) {
+    const category = schema.$id.split('/').reduce(
+      (prev, cur) => prev ? prev : cur)
+    if (!schemasByCategory[category]) {
+      schemasByCategory[category] = []
+    }
+    schemasByCategory[category].push(schema)
   }
-  const schemaIdWithoutSlashes = schemaId.replace(/[/]/g, '~')
+
   return (
     <main className="home-page">
-      <div className="schema-id">
-        <input
-          type="text"
-          value={schemaId}
-          onChange={(e) => setSchemaId(e.target.value)}
-        />
-        <button type="button" onClick={() => router.push(`/schema/${schemaIdWithoutSlashes}`)}>
-          Go to {schemaIdWithoutSlashes}
-        </button>
+      <div className="schemas">
+        {Object.entries(schemasByCategory).map(([category, schemasInCat]) => (
+          <div className="schemas-for-category" key={category}>
+            <h1>{category}</h1>
+            <div className="schemas">
+              <ul>
+                {schemasInCat.map(schema => (
+                  <li key={schema.$id}>
+                    <a href={`/schema/${schemaIdWithoutSlashes(schema.$id)}`}>
+                      {getSchemaDisplayName(schema)}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ))}
       </div>
     </main>
   )

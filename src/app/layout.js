@@ -1,5 +1,6 @@
 import { Inter } from "next/font/google"
 import "normalize.css/normalize.css"
+import "./global.sass"
 
 import { StorageProvider } from "@/utils/storage"
 
