@@ -25,7 +25,7 @@ export function schemaIdWithoutSlashes (schemaId) {
 }
 
 export function useSelectedSchemaId () {
-  return useParams().schemaId.replace(/~/g, '/')
+  return useParams().schemaId?.replace(/~/g, '/')
 }
 
 export function routeToSchema (schema) {
