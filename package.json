@@ -16,7 +16,6 @@
     "registry": "https://registry.npmjs.org"
   },
   "scripts": {
-    "generate-schemas": "cd ../data-extraction && yarn -s build && cd - > /dev/null && python ./scripts/collect_schemas.py ../data-extraction/build",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
