@@ -5,6 +5,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 
+import { basename } from './basename.js'
 import Home from './home.jsx'
 import { Root } from './root.jsx'
 import { JSONSchemaViewer } from './schema.jsx'
@@ -31,7 +32,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           }
         ]
       }
-    ])}
+    ], { basename })}
     />
   </React.StrictMode>
 )
