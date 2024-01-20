@@ -48,6 +48,7 @@ export function JSONSchemaViewer () {
   let at = schema
   const atTypeInfo = getTypeInfo(at)
   const pathNames = [atTypeInfo.name]
+  const pathTypes = [atTypeInfo.typeName]
   function goPastArraysAndMaps () {
     while (at.type === 'array' || at.patternProperties) {
       if (at.patternProperties) {
@@ -62,6 +63,7 @@ export function JSONSchemaViewer () {
     at = at.properties[curPiece]
     const curTypeInfo = getTypeInfo(at, curPiece)
     pathNames.push(curPiece ?? curTypeInfo.typeName)
+    pathTypes.push(curTypeInfo.typeName)
     goPastArraysAndMaps()
   }
   const directProps = at?.properties ?? {} // omitted if `at` is a primitive type
@@ -95,6 +97,9 @@ export function JSONSchemaViewer () {
         ))}
       </Breadcrumbs>
       <div className='schema-portion'>
+        <div className='main-type'>
+          <span className='property-type'>{pathTypes[pathTypes.length - 1]}</span>
+        </div>
         <Markdown className='description'>{desc}</Markdown>
         <Properties
           props={directProps}
