@@ -19,7 +19,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         element: <Root />,
         children: [
           {
-            path: 'schema/:schemaId',
+            path: ':schemaId',
             element: <JSONSchemaViewer />
           },
           {
