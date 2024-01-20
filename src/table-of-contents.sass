@@ -3,7 +3,7 @@
     opacity: 0.5
     &:hover, &.need-to-pick
         opacity: 1
-    .schemas-for-category
+    .main-schema, .schemas-for-category
         &:not(:first-child)
             margin-top: 1rem
         h1
@@ -20,3 +20,16 @@
             background-color: #FFA
             .schema-text span
                 font-weight: bold
+    .main-schema
+        .MuiListItemButton-root
+            margin-top: 1rem
+            padding: 0
+            .schema-text span
+                font-weight: bold
+                font-size: 1.2rem
+                .about
+                    color: #888
+                    font-size: 0.7rem
+                    font-style: italic
+                    font-weight: normal
+                    margin-top: 0.2rem

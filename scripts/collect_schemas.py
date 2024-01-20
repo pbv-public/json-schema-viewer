@@ -4,7 +4,7 @@ import os
 import sys
 
 
-def main(path_to_schema_json_files, prefixes_to_include=None):
+def main(path_to_schema_json_files, prefixes_to_include=None, main_id=None):
     """Generates the generated-schemas.js.
 
     Includes all *.schema.json files in the specified folder. If
@@ -36,7 +36,10 @@ def main(path_to_schema_json_files, prefixes_to_include=None):
                     break
         if ok:
             key_schema_ids.append(schema_id)
-    output_data = dict(schemas=schemas, key_schema_ids=key_schema_ids)
+    output_data = dict(
+        schemas=schemas,
+        key_schema_ids=key_schema_ids,
+        main_schema_id=main_id)
     data_str = json.dumps(output_data, indent=2, sort_keys=True)
     with open(output_fn, "w", encoding='utf-8') as out:
         out.write(f"export const schemas = {data_str}")
@@ -44,4 +47,7 @@ def main(path_to_schema_json_files, prefixes_to_include=None):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2].split(",") if len(sys.argv) > 2 else [])
+    main(
+        sys.argv[1],
+        sys.argv[2].split(",") if len(sys.argv) > 2 else [],
+        sys.argv[3] if len(sys.argv) > 3 else None)

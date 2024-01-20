@@ -3,12 +3,13 @@ import './table-of-contents.sass'
 import { List, ListItemButton, ListItemText } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 
-import { getAllSchemasToShow, getSchemaDisplayName, routeToSchema, useSelectedSchemaId } from './utils.js'
+import { getAllSchemasToShow, getMainSchema, getSchemaDisplayName, routeToSchema, useSelectedSchemaId } from './utils.js'
 
 export function TableOfContents () {
   const navigate = useNavigate()
   const selSchemaId = useSelectedSchemaId()
   const allSchemas = getAllSchemasToShow()
+  const mainSchema = getMainSchema()
   const schemasByCategory = {}
   for (const schema of allSchemas) {
     const category = schema.$id.split('/').reduce(
@@ -24,6 +25,19 @@ export function TableOfContents () {
   return (
     <div className={`table-of-contents${selSchemaId ? '' : ' need-to-pick'}`}>
       <div className='schemas'>
+        {mainSchema && (
+          <div className='main-schema'>
+            <ListItemButton
+              onClick={() => navigate(routeToSchema(mainSchema))}
+              className={mainSchema.$id === selSchemaId ? 'selected' : ''}
+            >
+              <ListItemText className='schema-text'>
+                {getSchemaDisplayName(mainSchema)}
+                <div className='about'>(main schema)</div>
+              </ListItemText>
+            </ListItemButton>
+          </div>
+        )}
         {categories.map(category => {
           const schemasInCat = schemasByCategory[category]
           return (

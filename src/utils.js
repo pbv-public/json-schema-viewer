@@ -10,10 +10,17 @@ function cmpCaseInsensitive (a, b) {
 
 export function getAllSchemasToShow () {
   const idsToShow = new Set(schemas.key_schema_ids)
+  idsToShow.delete(schemas.main_schema_id)
   const allSchemas = Object.values(schemas.schemas).filter(
     x => idsToShow.has(x.$id))
   allSchemas.sort(cmpCaseInsensitive)
   return allSchemas
+}
+
+export function getMainSchema () {
+  if (schemas.main_schema_id) {
+    return schemas.schemas[schemas.main_schema_id]
+  }
 }
 
 export function getSchemaDisplayName (schema) {

@@ -7,7 +7,7 @@ import Markdown from 'react-markdown'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 
 import { schemas } from './generated-schemas.js'
-import { getSchemaDisplayName } from './utils.js'
+import { getMainSchema, getSchemaDisplayName, routeToSchema } from './utils.js'
 
 export function JSONSchemaViewer () {
   const loc = useLocation()
@@ -28,11 +28,16 @@ export function JSONSchemaViewer () {
   }, [schemaId, setSearchParams])
 
   // clear the search params if they aren't for a valid schema
+  const mainSchema = getMainSchema()
   useEffect(() => {
-    if (!schema && schemaId) {
-      setSearchParams({})
+    if (!schema) {
+      if (!mainSchema) {
+        setSearchParams({})
+      } else {
+        navigate(routeToSchema(mainSchema))
+      }
     }
-  }, [schema, schemaId, setSearchParams])
+  }, [mainSchema, navigate, schema, schemaId, setSearchParams])
 
   // if no schema is selected, ask the user to pick one
   if (!schema) {
