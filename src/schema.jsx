@@ -46,17 +46,22 @@ export function JSONSchemaViewer () {
 
   // find the properties at this path, and the names of the path segments to it
   let at = schema
-  const pathNames = [getTypeInfo(at).name]
-  function goPastArrays () {
-    while (at.type === 'array') {
-      at = at.items
+  const atTypeInfo = getTypeInfo(at)
+  const pathNames = [atTypeInfo.name]
+  function goPastArraysAndMaps () {
+    while (at.type === 'array' || at.patternProperties) {
+      if (at.patternProperties) {
+        at = Object.values(at.patternProperties)[0]
+      } else {
+        at = at.items
+      }
     }
   }
   for (const curPiece of pathKeys) {
-    goPastArrays()
+    goPastArraysAndMaps()
     at = at.properties[curPiece]
     pathNames.push(getTypeInfo(at, curPiece).name)
-    goPastArrays()
+    goPastArraysAndMaps()
   }
   const directProps = at?.properties ?? {} // omitted if `at` is a primitive type
 
@@ -114,7 +119,7 @@ function Properties ({ props, at, pathKeys, goToPropPath }) {
 
 function Property ({ className, schema, fromKey, fromSchema, pathKeys, goToPropPath }) {
   const typeInfo = getTypeInfo(schema, fromKey)
-  const canClickInto = !typeInfo.isPrimitiveType && !typeInfo.hasPrimitiveType
+  const canClickInto = !typeInfo.isPrimitiveType
   const onClick = useCallback(() => {
     if (canClickInto) {
       goToPropPath(pathKeys.concat([fromKey]))
@@ -176,8 +181,36 @@ function ValidValues ({ validValues }) {
 
 function getTypeInfo (schema, fromKey) {
   if (schema.type === 'object') {
-    const typeName = getSchemaDisplayName(schema) ?? fromKey ?? 'object'
-    return { schema, typeName, name: typeName }
+    let isPrimitiveType = false
+    let typeName
+    if (schema.patternProperties) {
+      const [keyPattern, valueSchema] = Object.entries(schema.patternProperties)[0]
+      const valueTypeInfo = getTypeInfo(valueSchema)
+      if (valueTypeInfo.isPrimitiveType) {
+        isPrimitiveType = true
+      }
+      let niceKeyPattern = keyPattern
+      if (niceKeyPattern.startsWith('^')) {
+        niceKeyPattern = niceKeyPattern.substring(1)
+      }
+      if (niceKeyPattern.endsWith('$')) {
+        niceKeyPattern = niceKeyPattern.substring(0, niceKeyPattern.length - 1)
+      }
+      const match = schema.description.match(/The key is ([^. ]*)/)
+      if (match && match[1]) {
+        const keySchemaId = match[1]
+        const keySchema = schemas.schemas[keySchemaId]
+        if (keySchema) {
+          niceKeyPattern = getTypeInfo(keySchema).name
+        } else {
+          niceKeyPattern = keySchemaId
+        }
+      }
+      typeName = `Map<${niceKeyPattern}, ${valueTypeInfo.typeName}>`
+    } else {
+      typeName = getSchemaDisplayName(schema) ?? fromKey ?? 'object'
+    }
+    return { schema, typeName, name: typeName, isPrimitiveType }
   } else if (schema.type === 'array') {
     return getArrayType(schema, fromKey)
   } else {
@@ -230,7 +263,7 @@ function getArrayType (schema, fromKey) {
   if (hasMinOrMax) {
     typeName += extra
   }
-  return { hasPrimitiveType: isPrimitiveType, name, schema, typeName }
+  return { isPrimitiveType, name, schema, typeName }
 }
 
 function downloadSchema (schema) {
