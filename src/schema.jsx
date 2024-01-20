@@ -81,6 +81,7 @@ export function JSONSchemaViewer () {
     }
   }
 
+  const version = (schema === at) ? schema.__md5_version : null
   return (
     <div className='json-schema-viewer'>
       <Breadcrumbs separator={<ArrowRight />}>
@@ -107,6 +108,12 @@ export function JSONSchemaViewer () {
           at={at} pathKeys={pathKeys} goToPropPath={goToPropPath}
         />
       </div>
+      {version && (
+        <div className='schema-version'>
+          <span className='label'>{atTypeInfo.name} Schema Version Hash: </span>
+          <span className='version'>{version}</span>
+        </div>
+      )}
     </div>
   )
 }

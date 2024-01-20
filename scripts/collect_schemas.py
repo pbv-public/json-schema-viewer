@@ -36,6 +36,9 @@ def main(path_to_schema_json_files, prefixes_to_include=None, main_id=None):
                     break
         if ok:
             key_schemas[schema_id] = schema
+            md5_version = schema.get('properties', {}).pop('md5', {}).get('const')
+            if md5_version:
+                schema['__md5_version'] = md5_version
     output_data = dict(
         schemas=key_schemas,
         main_schema_id=main_id)
