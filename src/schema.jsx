@@ -159,7 +159,7 @@ function ValidValues ({ validValues }) {
     <div className='valid-values'>
       <span className='label'>Valid values:</span>
       {validValues.map(validValue =>
-        <Chip color='info' label={validValue} />
+        <Chip key={validValue} color='info' label={validValue} />
       )}
     </div>
   )
