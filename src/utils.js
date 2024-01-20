@@ -27,8 +27,8 @@ export function getSchemaDisplayName (schema) {
   return schema.title ?? schema.$id
 }
 
-export function schemaIdWithoutSlashes (schemaId) {
-  return schemaId.replace(/[/]/g, '~')
+export function schemaIdWithoutSlashes (schemaId, targetChar = '~') {
+  return schemaId.replace(/[/]/g, targetChar)
 }
 
 export function useSelectedSchemaId () {

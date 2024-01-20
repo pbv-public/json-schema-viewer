@@ -1,13 +1,13 @@
 import './schema.sass'
 
-import { ArrowRight } from '@mui/icons-material'
+import { ArrowRight, Download } from '@mui/icons-material'
 import { Breadcrumbs, Chip, Link } from '@mui/material'
 import { useCallback, useEffect } from 'react'
 import Markdown from 'react-markdown'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 
 import { schemas } from './generated-schemas.js'
-import { getMainSchema, getSchemaDisplayName, routeToSchema } from './utils.js'
+import { getMainSchema, getSchemaDisplayName, routeToSchema, schemaIdWithoutSlashes } from './utils.js'
 
 export function JSONSchemaViewer () {
   const loc = useLocation()
@@ -64,15 +64,19 @@ export function JSONSchemaViewer () {
     <div className='json-schema-viewer'>
       <Breadcrumbs separator={<ArrowRight />}>
         {pathNames.map((x, i) => (
-          <Link
-            key={i}
-            className={`path-part clickable${i === pathNames.length - 1 ? ' last-item' : ''}`}
-            underline='hover'
-            color={i === pathNames.length - 1 ? undefined : 'inherit'}
-            onClick={() => goToPropPath(pathKeys.slice(0, i))}
-          >
-            {x}
-          </Link>
+          <span key={i}>
+            {i === 0 && (
+              <Download className='clickable' onClick={() => downloadSchema(schema)} />
+            )}
+            <Link
+              className={`path-part clickable${i === pathNames.length - 1 ? ' last-item' : ''}`}
+              underline='hover'
+              color={i === pathNames.length - 1 ? undefined : 'inherit'}
+              onClick={() => goToPropPath(pathKeys.slice(0, i))}
+            >
+              {x}
+            </Link>
+          </span>
         ))}
       </Breadcrumbs>
       <div className='schema-portion'>
@@ -227,4 +231,27 @@ function getArrayType (schema, fromKey) {
     typeName += extra
   }
   return { hasPrimitiveType: isPrimitiveType, name, schema, typeName }
+}
+
+function downloadSchema (schema) {
+  const link = document.createElement('a')
+  link.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(
+    JSON.stringify(schema))
+  let name
+  if (schema.title) {
+    name = schema.title.toLocaleLowerCase().replace(/ /g, '_')
+  } else {
+    name = schemaIdWithoutSlashes(schema.$id, '_')
+    if (name.startsWith('_')) {
+      name = name.substring(1)
+    }
+  }
+  const version = schema.properties.version.const
+  if (version) {
+    name += `-${version}`
+  }
+  link.setAttribute('download', `${name}.schema.json`)
+  document.body.appendChild(link)
+  link.click()
+  link.parentNode.removeChild(link)
 }
