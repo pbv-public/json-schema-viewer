@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 
 import { schemas } from './generated-schemas.js'
 
@@ -32,7 +32,7 @@ export function schemaIdWithoutSlashes (schemaId) {
 }
 
 export function useSelectedSchemaId () {
-  return useParams().schemaId?.replace(/~/g, '/')
+  return useSearchParams()[0].get('s')?.replace(/~/g, '/')
 }
 
 export function routeToSchema (schema) {
