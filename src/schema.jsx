@@ -91,7 +91,7 @@ function Property ({ className, schema, fromKey, fromSchema, pathKeys, goToPropP
       goToPropPath(pathKeys.concat([fromKey]))
     }
   }, [canClickInto, fromKey, goToPropPath, pathKeys])
-  const { min, max, typeName, value } = getTypeInfo(schema, fromKey)
+  const { min, max, typeName, validValues, value } = getTypeInfo(schema, fromKey)
   return (
     <div className={`property ${className}`}>
       <div
@@ -111,6 +111,7 @@ function Property ({ className, schema, fromKey, fromSchema, pathKeys, goToPropP
           : null}
         <MinMaxChip min={min} max={max} />
       </div>
+      <ValidValues validValues={validValues} />
       <Markdown className='description'>{schema.description}</Markdown>
     </div>
   )
@@ -130,6 +131,20 @@ function MinMaxChip ({ min, max }) {
   }
 }
 
+function ValidValues ({ validValues }) {
+  if (!validValues) {
+    return
+  }
+  return (
+    <div className='valid-values'>
+      <span className='label'>Valid values:</span>
+      {validValues.map(validValue =>
+        <Chip color='info' label={validValue} />
+      )}
+    </div>
+  )
+}
+
 function getTypeInfo (schema, fromKey) {
   if (schema.type === 'object') {
     const typeName = getSchemaDisplayName(schema) ?? fromKey ?? 'object'
@@ -139,6 +154,7 @@ function getTypeInfo (schema, fromKey) {
   } else {
     const name = getSchemaDisplayName(schema) ?? schema.type
     const ret = {
+      validValues: schema.enum,
       min: schema.minimum,
       max: schema.maximum,
       isPrimitiveType: true,
