@@ -1,15 +1,19 @@
+"""Script to generate the generated-schemas.js source file."""
 import json
 import os
 import sys
 
 
 def main(path_to_schema_json_files, prefixes_to_ignore):
+    """Generates the generated-schemas.js.
+    """
     schemas = {}
     for schema_id in os.listdir(path_to_schema_json_files):
         if not schema_id.endswith(".schema.json"):
             continue
         fn = os.path.join(path_to_schema_json_files, schema_id)
-        schema = json.loads(open(fn, "r").read())
+        with open(fn, "r", encoding='utf-8') as fin:
+            schema = json.loads(fin.read())
         schema_id = schema.get("$id")
         if schema_id:
             schemas[schema_id] = schema
@@ -27,7 +31,8 @@ def main(path_to_schema_json_files, prefixes_to_ignore):
             key_schema_ids.append(schema_id)
     output_data = dict(schemas=schemas, key_schema_ids=key_schema_ids)
     data_str = json.dumps(output_data, indent=2, sort_keys=True)
-    open(output_fn, "w").write(f"export const schemas = {data_str}")
+    with open(output_fn, "w", encoding='utf-8') as out:
+        out.write(f"export const schemas = {data_str}")
     print(f'found {len(schemas)} schema{"" if len(schemas) == 1 else "s"}')
 
 
