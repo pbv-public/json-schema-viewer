@@ -279,7 +279,7 @@ function downloadSchema (schema) {
       name = name.substring(1)
     }
   }
-  const version = schema.properties.version.const
+  const version = schema.properties?.version?.const
   if (version) {
     name += `-${version}`
   }
