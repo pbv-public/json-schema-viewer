@@ -4,8 +4,12 @@ import os
 import sys
 
 
-def main(path_to_schema_json_files, prefixes_to_ignore):
+def main(path_to_schema_json_files, prefixes_to_include=None):
     """Generates the generated-schemas.js.
+
+    Includes all *.schema.json files in the specified folder. If
+    prefixes_to_include is provided, then only files whose $id matches at least
+    one of these prefixes will be included.
     """
     schemas = {}
     for schema_id in os.listdir(path_to_schema_json_files):
@@ -22,11 +26,14 @@ def main(path_to_schema_json_files, prefixes_to_ignore):
     output_fn = os.path.join(script_dir, "../src/generated-schemas.js")
     key_schema_ids = []
     for schema_id in schemas:
-        ok = True
-        for prefix_to_ignore in prefixes_to_ignore:
-            if schema_id.startswith(prefix_to_ignore):
-                ok = False
-                break
+        ok = False
+        if not prefixes_to_include:
+            ok = True
+        else:
+            for prefix_to_include in prefixes_to_include:
+                if schema_id.startswith(prefix_to_include):
+                    ok = True
+                    break
         if ok:
             key_schema_ids.append(schema_id)
     output_data = dict(schemas=schemas, key_schema_ids=key_schema_ids)
