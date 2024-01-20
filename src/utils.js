@@ -1,6 +1,21 @@
 import { useSearchParams } from 'react-router-dom'
+import traverse from 'traverse'
 
 import { schemas } from './generated-schemas.js'
+
+// flatten $ref but keep $ref in the flattened objects so the UI knows the
+// schema from which something is from
+traverse(schemas.schemas).forEach(function (x) {
+  // xRest has the custom title and description for the node, if any
+  const { $ref, ...xRest } = (x ?? {})
+  if ($ref) {
+    const schema = schemas.schemas[$ref]
+    if (schema) {
+      const { $id, $schema, ...rest } = schema
+      this.update({ ...rest, ...xRest, $ref })
+    }
+  }
+})
 
 function cmpCaseInsensitive (a, b) {
   const aName = getSchemaDisplayName(a).toLocaleLowerCase()

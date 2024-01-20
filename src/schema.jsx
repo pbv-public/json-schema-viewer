@@ -73,6 +73,14 @@ export function JSONSchemaViewer () {
   }
   const directProps = at?.properties ?? {} // omitted if `at` is a primitive type
 
+  let desc = at.description
+  if (at.$ref) {
+    const refSchema = schemas.schemas[at.$ref]
+    if (refSchema?.description) {
+      desc = refSchema?.description
+    }
+  }
+
   return (
     <div className='json-schema-viewer'>
       <Breadcrumbs separator={<ArrowRight />}>
@@ -93,7 +101,7 @@ export function JSONSchemaViewer () {
         ))}
       </Breadcrumbs>
       <div className='schema-portion'>
-        <Markdown className='description'>{at.description}</Markdown>
+        <Markdown className='description'>{desc}</Markdown>
         <Properties
           props={directProps}
           at={at} pathKeys={pathKeys} goToPropPath={goToPropPath}
@@ -127,7 +135,7 @@ function Properties ({ props, at, pathKeys, goToPropPath }) {
 
 function Property ({ className, schema, fromKey, fromSchema, pathKeys, goToPropPath }) {
   const typeInfo = getTypeInfo(schema, fromKey)
-  const canClickInto = !typeInfo.isPrimitiveType
+  const canClickInto = !typeInfo.isPrimitiveType || typeInfo.schema.$ref
   const onClick = useCallback(() => {
     if (canClickInto) {
       goToPropPath(pathKeys.concat([fromKey]))
@@ -236,6 +244,11 @@ function getTypeInfo (schema, fromKey) {
     if (c !== undefined) {
       ret.value = c
       ret.typeName = Array.isArray(c) ? 'array' : typeof c
+    } else if (schema.$ref) {
+      const refSchema = schemas.schemas[schema.$ref]
+      if (refSchema?.title) {
+        ret.typeName = refSchema.title
+      }
     }
     return ret
   }
