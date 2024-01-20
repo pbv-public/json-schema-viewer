@@ -24,8 +24,8 @@ def main(path_to_schema_json_files, prefixes_to_include=None, main_id=None):
     assert schemas, "expected to find at least one schema file with a $id"
     script_dir = os.path.dirname(__file__)
     output_fn = os.path.join(script_dir, "../src/generated-schemas.js")
-    key_schema_ids = []
-    for schema_id in schemas:
+    key_schemas = {}
+    for schema_id, schema in schemas.items():
         ok = False
         if not prefixes_to_include:
             ok = True
@@ -35,10 +35,9 @@ def main(path_to_schema_json_files, prefixes_to_include=None, main_id=None):
                     ok = True
                     break
         if ok:
-            key_schema_ids.append(schema_id)
+            key_schemas[schema_id] = schema
     output_data = dict(
-        schemas=schemas,
-        key_schema_ids=key_schema_ids,
+        schemas=key_schemas,
         main_schema_id=main_id)
     data_str = json.dumps(output_data, indent=2, sort_keys=True)
     with open(output_fn, "w", encoding='utf-8') as out:

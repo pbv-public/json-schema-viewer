@@ -24,12 +24,11 @@ function cmpCaseInsensitive (a, b) {
 }
 
 export function getAllSchemasToShow () {
-  const idsToShow = new Set(schemas.key_schema_ids)
-  idsToShow.delete(schemas.main_schema_id)
-  const allSchemas = Object.values(schemas.schemas).filter(
-    x => idsToShow.has(x.$id))
-  allSchemas.sort(cmpCaseInsensitive)
-  return allSchemas
+  const allSchemas = Object.values(schemas.schemas)
+  const schemasToShow = allSchemas.filter(
+    x => x.$id && x.$id !== schemas.main_schema_id)
+  schemasToShow.sort(cmpCaseInsensitive)
+  return schemasToShow
 }
 
 export function getMainSchema () {
