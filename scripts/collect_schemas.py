@@ -41,9 +41,10 @@ def main(path_to_schema_json_files, main_id=None):
         key_schemas = dict((k, schemas[k]) for k in seen)
 
     for schema in key_schemas.values():
-        md5_version = schema.get("properties", {}).pop("md5", {}).get("const")
-        if md5_version:
-            schema["__md5_version"] = md5_version
+        md5_functional = schema.get("properties", {}).pop("md5_functional", {}).get("const")
+        md5_full = schema.get("properties", {}).pop("md5_full", {}).get("const")
+        if md5_full:
+            schema["__md5"] = dict(full=md5_full, functional=md5_functional)
     output_data = dict(
         schemas=key_schemas,
         main_schema_id=main_id)
