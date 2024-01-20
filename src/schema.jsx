@@ -85,7 +85,8 @@ function Properties ({ props, at, pathKeys, goToPropPath }) {
 }
 
 function Property ({ className, schema, fromKey, fromSchema, pathKeys, goToPropPath }) {
-  const canClickInto = !getTypeInfo(schema, fromKey).isPrimitiveType
+  const typeInfo = getTypeInfo(schema, fromKey)
+  const canClickInto = !typeInfo.isPrimitiveType && !typeInfo.hasPrimitiveType
   const onClick = useCallback(() => {
     if (canClickInto) {
       goToPropPath(pathKeys.concat([fromKey]))
@@ -178,7 +179,7 @@ function getArrayType (schema, fromKey) {
     schema = schema.items
     arrayWraps.push({ min, max })
   }
-  let { typeName } = getTypeInfo(schema, fromKey)
+  let { isPrimitiveType, typeName } = getTypeInfo(schema, fromKey)
   let extra = ''
   let hasMinOrMax = false
   for (const { min, max } of arrayWraps) {
@@ -201,5 +202,5 @@ function getArrayType (schema, fromKey) {
   if (hasMinOrMax) {
     typeName += extra
   }
-  return { name, schema, typeName }
+  return { hasPrimitiveType: isPrimitiveType, name, schema, typeName }
 }
