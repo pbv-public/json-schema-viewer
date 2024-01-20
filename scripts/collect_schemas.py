@@ -16,7 +16,7 @@ def main(path_to_schema_json_files, prefixes_to_include=None, main_id=None):
         if not schema_id.endswith(".schema.json"):
             continue
         fn = os.path.join(path_to_schema_json_files, schema_id)
-        with open(fn, "r", encoding='utf-8') as fin:
+        with open(fn, "r", encoding="utf-8") as fin:
             schema = json.loads(fin.read())
         schema_id = schema.get("$id")
         if schema_id:
@@ -36,14 +36,14 @@ def main(path_to_schema_json_files, prefixes_to_include=None, main_id=None):
                     break
         if ok:
             key_schemas[schema_id] = schema
-            md5_version = schema.get('properties', {}).pop('md5', {}).get('const')
+            md5_version = schema.get("properties", {}).pop("md5", {}).get("const")
             if md5_version:
-                schema['__md5_version'] = md5_version
+                schema["__md5_version"] = md5_version
     output_data = dict(
         schemas=key_schemas,
         main_schema_id=main_id)
     data_str = json.dumps(output_data, indent=2, sort_keys=True)
-    with open(output_fn, "w", encoding='utf-8') as out:
+    with open(output_fn, "w", encoding="utf-8") as out:
         out.write(f"export const schemas = {data_str}")
     print(f'found {len(schemas)} schema{"" if len(schemas) == 1 else "s"}')
 
