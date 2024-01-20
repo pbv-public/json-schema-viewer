@@ -29,5 +29,5 @@ export function useSelectedSchemaId () {
 }
 
 export function routeToSchema (schema) {
-  return `/${schemaIdWithoutSlashes(schema.$id)}`
+  return `/?s=${schemaIdWithoutSlashes(schema.$id)}`
 }

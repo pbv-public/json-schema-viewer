@@ -2,23 +2,42 @@ import './schema.sass'
 
 import { ArrowRight } from '@mui/icons-material'
 import { Breadcrumbs, Chip, Link } from '@mui/material'
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import Markdown from 'react-markdown'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 
 import { schemas } from './generated-schemas.js'
 import { getSchemaDisplayName } from './utils.js'
 
 export function JSONSchemaViewer () {
-  const schemaId = useParams().schemaId.replace(/~/g, '/')
-  const schema = schemas.schemas[schemaId]
+  const loc = useLocation()
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (loc.pathname !== '/') {
+      navigate('/')
+    }
+  }, [loc, navigate])
 
   const [searchParams, setSearchParams] = useSearchParams()
+  const schemaId = (searchParams.get('s') ?? '').replace(/~/g, '/')
+  const schema = schemas.schemas[schemaId]
   const pathStr = searchParams.get('p') ?? '' // empty=root, x.y.z = child
   const pathKeys = pathStr ? pathStr.split('.') : []
   const goToPropPath = useCallback(pathKeys => {
-    setSearchParams({ p: pathKeys.join('.') })
-  }, [setSearchParams])
+    setSearchParams({ s: schemaId, p: pathKeys.join('.') })
+  }, [schemaId, setSearchParams])
+
+  // clear the search params if they aren't for a valid schema
+  useEffect(() => {
+    if (!schema && schemaId) {
+      setSearchParams({})
+    }
+  }, [schema, schemaId, setSearchParams])
+
+  // if no schema is selected, ask the user to pick one
+  if (!schema) {
+    return <div style={{ margin: '0.5rem 1rem' }}>Pick a schema to explore!</div>
+  }
 
   // find the properties at this path, and the names of the path segments to it
   let at = schema
@@ -34,7 +53,7 @@ export function JSONSchemaViewer () {
     pathNames.push(getTypeInfo(at, curPiece).name)
     goPastArrays()
   }
-  const directProps = at.properties ?? {} // omitted if `at` is a primitive type
+  const directProps = at?.properties ?? {} // omitted if `at` is a primitive type
 
   return (
     <div className='json-schema-viewer'>
