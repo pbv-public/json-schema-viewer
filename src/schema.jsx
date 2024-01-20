@@ -2,7 +2,7 @@ import './schema.sass'
 
 import { ArrowRight, Download } from '@mui/icons-material'
 import { Breadcrumbs, Chip, Link } from '@mui/material'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Markdown from 'react-markdown'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 
@@ -26,6 +26,16 @@ export function JSONSchemaViewer () {
   const goToPropPath = useCallback(pathKeys => {
     setSearchParams({ s: schemaId, p: pathKeys.join('.') })
   }, [schemaId, setSearchParams])
+
+  // scroll to the top of the window whenever we go to a new view (otherwise
+  // on a short window we might be looking at an empty space)
+  const [oldQS, setOldQueryString] = useState({ schemaId, pathStr })
+  useEffect(() => {
+    if (oldQS.pathStr !== pathStr || oldQS.schemaId !== schemaId) {
+      setOldQueryString({ schemaId, pathStr })
+      window.scrollTo(0, 0)
+    }
+  }, [oldQS, pathStr, schemaId])
 
   // clear the search params if they aren't for a valid schema
   const mainSchema = getMainSchema()
