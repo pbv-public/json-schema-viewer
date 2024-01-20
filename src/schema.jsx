@@ -57,18 +57,11 @@ export function JSONSchemaViewer () {
       }
     }
   }
-  function normalize (s) {
-    return s.toLocaleLowerCase().replace(/_/g, ' ')
-  }
   for (const curPiece of pathKeys) {
     goPastArraysAndMaps()
     at = at.properties[curPiece]
     const curTypeInfo = getTypeInfo(at, curPiece)
-    if (normalize(curPiece) === normalize(curTypeInfo.typeName)) {
-      pathNames.push(curPiece)
-    } else {
-      pathNames.push(`${curTypeInfo.typeName} ${curPiece}`)
-    }
+    pathNames.push(curPiece ?? curTypeInfo.typeName)
     goPastArraysAndMaps()
   }
   const directProps = at?.properties ?? {} // omitted if `at` is a primitive type
