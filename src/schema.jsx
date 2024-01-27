@@ -243,7 +243,10 @@ function getTypeInfo (schema, fromKey) {
           niceKeyPattern = keySchemaId
         }
       }
-      typeName = `Map<${niceKeyPattern}, ${valueTypeInfo.typeName}>`
+      const valueTypeName = valueTypeInfo.validValues
+        ? `enum<${valueTypeInfo.typeName}>`
+        : valueTypeInfo.typeName
+      typeName = `Map<${niceKeyPattern}, ${valueTypeName}>`
     } else {
       typeName = getSchemaDisplayName(schema) ?? fromKey ?? 'object'
     }
