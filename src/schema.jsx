@@ -153,7 +153,7 @@ function Property ({ className, schema, fromKey, fromSchema, pathKeys, goToPropP
   }, [canClickInto, fromKey, goToPropPath, pathKeys])
 
   let desc = schema.description
-  if (fromKey && schema.$ref) {
+  if (!fromKey && schema.$ref) {
     const refSchema = schemas.schemas[schema.$ref]
     if (refSchema?.description) {
       desc = refSchema?.description
