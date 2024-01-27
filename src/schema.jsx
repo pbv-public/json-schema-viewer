@@ -78,14 +78,6 @@ export function JSONSchemaViewer () {
   }
   const directProps = at?.properties ?? {} // omitted if `at` is a primitive type
 
-  let desc = at.description
-  if (at.$ref) {
-    const refSchema = schemas.schemas[at.$ref]
-    if (refSchema?.description) {
-      desc = refSchema?.description
-    }
-  }
-
   const md5s = (schema === at) ? schema.__md5 : null
   return (
     <div className='json-schema-viewer'>
@@ -107,10 +99,7 @@ export function JSONSchemaViewer () {
         ))}
       </Breadcrumbs>
       <div className='schema-portion'>
-        <div className='main-type'>
-          <span className='property-type'>{pathTypes[pathTypes.length - 1]}</span>
-        </div>
-        <Markdown className='description'>{desc}</Markdown>
+        <Property className='main-type' schema={at} />
         <Properties
           props={directProps}
           at={at} pathKeys={pathKeys} goToPropPath={goToPropPath}
@@ -156,12 +145,21 @@ function Properties ({ props, at, pathKeys, goToPropPath }) {
 
 function Property ({ className, schema, fromKey, fromSchema, pathKeys, goToPropPath }) {
   const typeInfo = getTypeInfo(schema, fromKey)
-  const canClickInto = !typeInfo.isPrimitiveType || typeInfo.schema.$ref
+  const canClickInto = fromKey && (!typeInfo.isPrimitiveType || typeInfo.schema.$ref)
   const onClick = useCallback(() => {
     if (canClickInto) {
       goToPropPath(pathKeys.concat([fromKey]))
     }
   }, [canClickInto, fromKey, goToPropPath, pathKeys])
+
+  let desc = schema.description
+  if (fromKey && schema.$ref) {
+    const refSchema = schemas.schemas[schema.$ref]
+    if (refSchema?.description) {
+      desc = refSchema?.description
+    }
+  }
+
   const { min, max, typeName, validValues, value } = getTypeInfo(schema, fromKey)
   return (
     <div className={`property ${className}`}>
@@ -177,13 +175,13 @@ function Property ({ className, schema, fromKey, fromSchema, pathKeys, goToPropP
             <Chip label='const' />
           </>
         )}
-        {(fromSchema.required?.indexOf(fromKey) ?? -1) === -1
+        {fromSchema && (fromSchema.required?.indexOf(fromKey) ?? -1) === -1
           ? <Chip label='optional' />
           : null}
         <MinMaxChip min={min} max={max} />
       </div>
       <ValidValues validValues={validValues} />
-      <Markdown className='description'>{schema.description}</Markdown>
+      <Markdown className='description'>{desc}</Markdown>
     </div>
   )
 }
