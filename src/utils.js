@@ -17,7 +17,7 @@ traverse(schemas.schemas).forEach(function (x) {
   }
 })
 
-function cmpCaseInsensitive (a, b) {
+export function cmpCaseInsensitive (a, b) {
   const aName = getSchemaDisplayName(a).toLocaleLowerCase()
   const bName = getSchemaDisplayName(b).toLocaleLowerCase()
   return aName.localeCompare(bName)

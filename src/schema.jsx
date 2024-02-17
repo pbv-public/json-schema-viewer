@@ -7,7 +7,7 @@ import Markdown from 'react-markdown'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 
 import { schemas } from './generated-schemas.js'
-import { getMainSchema, getSchemaDisplayName, routeToSchema, schemaIdWithoutSlashes } from './utils.js'
+import { cmpCaseInsensitive, getMainSchema, getSchemaDisplayName, routeToSchema, schemaIdWithoutSlashes } from './utils.js'
 
 export function JSONSchemaViewer () {
   const loc = useLocation()
@@ -215,6 +215,33 @@ function ValidValues ({ validValues }) {
 }
 
 function getTypeInfo (schema, fromKey) {
+  if (Array.isArray(schema.type)) {
+    const typeInfos = schema.type.map(
+      x => getTypeInfo({ ...schema, type: x }, fromKey))
+    const ret = {}
+    const names = []
+    const typeNames = []
+    for (const x of typeInfos) {
+      names.push(x.name)
+      typeNames.push(x.typeName)
+      const isPrimitiveType = ret.isPrimitiveType && x.isPrimitiveType
+      Object.assign(ret, x)
+      ret.isPrimitiveType = isPrimitiveType
+    }
+    const nullIdx = typeNames.indexOf('null')
+    let name, typeName
+    if (nullIdx === -1) {
+      name = `Union<${names.sort(cmpCaseInsensitive).join('|')}>`
+      typeName = `Union<${typeNames.sort(cmpCaseInsensitive).join('|')}>`
+    } else {
+      const mainName = names[nullIdx ? 0 : 1]
+      name = `Nullable<${mainName}>`
+      const mainType = typeNames[nullIdx ? 0 : 1]
+      typeName = `Nullable<${mainType}>`
+    }
+    return { ...ret, name, typeName, typeInfos }
+  }
+
   if (schema.type === 'object') {
     let isPrimitiveType = false
     let typeName
