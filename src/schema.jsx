@@ -122,6 +122,13 @@ export function JSONSchemaViewer () {
 }
 
 function Properties ({ props, at, pathKeys, goToPropPath }) {
+  if (at.anyOf) {
+    const typeInfo = getTypeInfo(at)
+    if (typeInfo.nullable) {
+      props = typeInfo.schema.properties ?? {}
+    }
+  }
+
   if (!Object.keys(props).length) {
     return
   }
@@ -144,23 +151,25 @@ function Properties ({ props, at, pathKeys, goToPropPath }) {
 }
 
 function Property ({ className, schema, fromKey, fromSchema, pathKeys, goToPropPath }) {
-  const typeInfo = getTypeInfo(schema, fromKey)
-  const canClickInto = fromKey && (!typeInfo.isPrimitiveType || typeInfo.schema.$ref)
+  const { isPrimitiveType, min, max, nullable, schema: schemaFromGetTypeInfo, typeInfos, typeName, validValues, value } = getTypeInfo(schema, fromKey)
+
+  const canClickInto = fromKey && (!isPrimitiveType || schemaFromGetTypeInfo.$ref)
   const onClick = useCallback(() => {
     if (canClickInto) {
       goToPropPath(pathKeys.concat([fromKey]))
     }
   }, [canClickInto, fromKey, goToPropPath, pathKeys])
 
-  let desc = schema.description
-  if (!fromKey && schema.$ref) {
-    const refSchema = schemas.schemas[schema.$ref]
+  const schemaForInfo = nullable ? schemaFromGetTypeInfo : schema
+
+  let desc = schemaForInfo.description
+  if (!fromKey && schemaForInfo.$ref) {
+    const refSchema = schemas.schemas[schemaForInfo.$ref]
     if (refSchema?.description) {
       desc = refSchema?.description
     }
   }
 
-  const { min, max, typeInfos, typeName, validValues, value } = getTypeInfo(schema, fromKey)
   return (
     <div className={`property ${className}`}>
       <div
@@ -233,7 +242,7 @@ function ValidValues ({ validValues }) {
 function getTypeInfo (schema, fromKey) {
   if (schema.anyOf) {
     const typeInfos = schema.anyOf.map(x => getTypeInfo(x, fromKey))
-    const ret = {}
+    let ret = {}
     const names = []
     const typeNames = []
     for (const x of typeInfos) {
@@ -249,17 +258,18 @@ function getTypeInfo (schema, fromKey) {
     if (!isNullableType) {
       name = `Union<${names.sort(cmpCaseInsensitive).join('|')}>`
       typeName = `Union<${typeNames.sort(cmpCaseInsensitive).join('|')}>`
+      ret.typeInfos = typeInfos
     } else {
-      const mainName = names[nullIdx ? 0 : 1]
+      const nonNullIdx = nullIdx ? 0 : 1
+      const mainName = names[nonNullIdx]
       name = `Nullable<${mainName}>`
-      const mainType = typeNames[nullIdx ? 0 : 1]
+      const mainType = typeNames[nonNullIdx]
       typeName = `Nullable<${mainType}>`
+      ret = typeInfos[nonNullIdx]
+      ret.nullable = true
     }
     ret.name = name
     ret.typeName = schema.title ?? typeName
-    if (!isNullableType) {
-      ret.typeInfos = typeInfos
-    }
     return ret
   }
 
