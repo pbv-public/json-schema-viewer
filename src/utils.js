@@ -18,16 +18,22 @@ traverse(schemas.schemas).forEach(function (x) {
 })
 
 export function cmpCaseInsensitive (a, b) {
-  const aName = getSchemaDisplayName(a).toLocaleLowerCase()
-  const bName = getSchemaDisplayName(b).toLocaleLowerCase()
+  const aName = a.toLocaleLowerCase()
+  const bName = b.toLocaleLowerCase()
   return aName.localeCompare(bName)
+}
+
+function cmpSchemaDisplayNameCaseInsensitive (a, b) {
+  const aName = getSchemaDisplayName(a)
+  const bName = getSchemaDisplayName(b)
+  return cmpCaseInsensitive(aName, bName)
 }
 
 export function getAllSchemasToShow () {
   const allSchemas = Object.values(schemas.schemas)
   const schemasToShow = allSchemas.filter(
     x => x.$id && x.$id !== schemas.main_schema_id)
-  schemasToShow.sort(cmpCaseInsensitive)
+  schemasToShow.sort(cmpSchemaDisplayNameCaseInsensitive)
   return schemasToShow
 }
 

@@ -160,7 +160,7 @@ function Property ({ className, schema, fromKey, fromSchema, pathKeys, goToPropP
     }
   }
 
-  const { min, max, typeName, validValues, value } = getTypeInfo(schema, fromKey)
+  const { min, max, typeInfos, typeName, validValues, value } = getTypeInfo(schema, fromKey)
   return (
     <div className={`property ${className}`}>
       <div
@@ -182,6 +182,22 @@ function Property ({ className, schema, fromKey, fromSchema, pathKeys, goToPropP
       </div>
       <ValidValues validValues={validValues} />
       <Markdown className='description'>{desc}</Markdown>
+      {typeInfos && (
+        <div className='union-types'>
+          {typeInfos.map(ti => (
+            <Property
+              key={ti.typeName}
+              unionTypeInfo={ti}
+              className={className}
+              schema={ti.schema}
+              fromKey={fromKey}
+              fromSchema={fromSchema}
+              pathKeys={pathKeys}
+              goToPropPath={goToPropPath}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -215,9 +231,8 @@ function ValidValues ({ validValues }) {
 }
 
 function getTypeInfo (schema, fromKey) {
-  if (Array.isArray(schema.type)) {
-    const typeInfos = schema.type.map(
-      x => getTypeInfo({ ...schema, type: x }, fromKey))
+  if (schema.anyOf) {
+    const typeInfos = schema.anyOf.map(x => getTypeInfo(x, fromKey))
     const ret = {}
     const names = []
     const typeNames = []
@@ -230,7 +245,8 @@ function getTypeInfo (schema, fromKey) {
     }
     const nullIdx = typeNames.indexOf('null')
     let name, typeName
-    if (nullIdx === -1) {
+    const isNullableType = (nullIdx !== -1 && typeNames.length === 2)
+    if (!isNullableType) {
       name = `Union<${names.sort(cmpCaseInsensitive).join('|')}>`
       typeName = `Union<${typeNames.sort(cmpCaseInsensitive).join('|')}>`
     } else {
@@ -239,7 +255,12 @@ function getTypeInfo (schema, fromKey) {
       const mainType = typeNames[nullIdx ? 0 : 1]
       typeName = `Nullable<${mainType}>`
     }
-    return { ...ret, name, typeName, typeInfos }
+    ret.name = name
+    ret.typeName = schema.title ?? typeName
+    if (!isNullableType) {
+      ret.typeInfos = typeInfos
+    }
+    return ret
   }
 
   if (schema.type === 'object') {
