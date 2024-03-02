@@ -27,6 +27,7 @@
     }
   },
   "rules": {
+    "import/extensions": ["error", "ignorePackages"],
     "import/order": [
       "error",
       {
