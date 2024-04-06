@@ -122,13 +122,12 @@ export function JSONSchemaViewer () {
 }
 
 function Properties ({ props, at, pathKeys, goToPropPath }) {
+  const typeInfo = getTypeInfo(at)
   if (at.anyOf) {
-    const typeInfo = getTypeInfo(at)
     if (typeInfo.nullable) {
       props = typeInfo.schema.properties ?? {}
     }
   }
-
   if (!Object.keys(props).length) {
     return
   }
@@ -144,13 +143,14 @@ function Properties ({ props, at, pathKeys, goToPropPath }) {
           fromSchema={at}
           pathKeys={pathKeys}
           goToPropPath={goToPropPath}
+          polymorphicTypeInfos={(typeInfo.polymorphicTypeInfos?.kindKey === k) ? typeInfo.polymorphicTypeInfos : null}
         />
       ))}
     </>
   )
 }
 
-function Property ({ className, schema, fromKey, fromSchema, pathKeys, goToPropPath }) {
+function Property ({ className, schema, fromKey, fromSchema, pathKeys, goToPropPath, polymorphicTypeInfos }) {
   const { isPrimitiveType, min, max, nullable, schema: schemaFromGetTypeInfo, typeInfos, typeName, validValues, value } = getTypeInfo(schema, fromKey)
 
   const canClickInto = fromKey && (!isPrimitiveType || schemaFromGetTypeInfo.$ref)
@@ -191,6 +191,33 @@ function Property ({ className, schema, fromKey, fromSchema, pathKeys, goToPropP
       </div>
       <ValidValues validValues={validValues} />
       <Markdown className='description'>{desc}</Markdown>
+      {polymorphicTypeInfos && (
+        <ul className='polymorphic-variants'>
+          {polymorphicTypeInfos.kinds.map(({ kind, typeInfo }) => (
+            <li key={kind}>
+              <span className='kind-name'>
+                Additional properties for <Chip color='info' label={kind} />:
+              </span>
+              <ul className='polymorphic-props'>
+                {Object.keys(typeInfo.schema.properties).sort(cmpCaseInsensitive).map((propName, propIdx) => {
+                  const propSchema = typeInfo.schema.properties[propName]
+                  return (
+                    <Property
+                      key={propName}
+                      className={propIdx === 0 ? 'first' : ''}
+                      schema={propSchema}
+                      fromKey={propName}
+                      fromSchema={typeInfo.schema}
+                      pathKeys={pathKeys}
+                      goToPropPath={goToPropPath}
+                    />
+                  )
+                })}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      )}
       {typeInfos && (
         <div className='union-types'>
           {typeInfos.map(ti => (
@@ -202,7 +229,7 @@ function Property ({ className, schema, fromKey, fromSchema, pathKeys, goToPropP
               fromKey={fromKey}
               fromSchema={fromSchema}
               pathKeys={pathKeys}
-              goToPropPath={goToPropPath}
+              goToPropPath={() => {}}
             />
           ))}
         </div>
@@ -303,7 +330,28 @@ function getTypeInfo (schema, fromKey) {
     } else {
       typeName = getSchemaDisplayName(schema) ?? fromKey ?? 'object'
     }
-    return { schema, typeName, name: typeName, isPrimitiveType }
+    const ret = { schema, typeName, name: typeName, isPrimitiveType }
+    let polymorphicTypeInfos
+    let pSchema = schema
+    while (pSchema?.if) {
+      if (!polymorphicTypeInfos) {
+        const ifKey = Object.keys(pSchema.if.properties)[0]
+        polymorphicTypeInfos = { kindKey: ifKey, kinds: [] }
+      }
+      const ifValue = pSchema.if.properties[polymorphicTypeInfos.kindKey].const
+      polymorphicTypeInfos.kinds.push({
+        kind: ifValue,
+        typeInfo: getTypeInfo({
+          ...pSchema.then,
+          type: 'object'
+        })
+      })
+      pSchema = pSchema.else
+    }
+    if (polymorphicTypeInfos) {
+      ret.polymorphicTypeInfos = polymorphicTypeInfos
+    }
+    return ret
   } else if (schema.type === 'array') {
     return getArrayType(schema, fromKey)
   } else {
