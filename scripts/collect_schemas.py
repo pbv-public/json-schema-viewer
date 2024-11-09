@@ -1,4 +1,5 @@
 """Script to generate the generated-schemas.js source file."""
+
 import json
 import os
 import sys
@@ -41,21 +42,21 @@ def main(path_to_schema_json_files, main_id=None):
         key_schemas = dict((k, schemas[k]) for k in seen)
 
     for schema in key_schemas.values():
-        md5_functional = schema.get("properties", {}).pop("md5_functional", {}).get("const")
+        md5_functional = (
+            schema.get("properties", {}).pop("md5_functional", {}).get("const")
+        )
         md5_full = schema.get("properties", {}).pop("md5_full", {}).get("const")
         if md5_full:
             schema["__md5"] = dict(full=md5_full, functional=md5_functional)
-    output_data = dict(
-        schemas=key_schemas,
-        main_schema_id=main_id)
+    output_data = dict(schemas=key_schemas, main_schema_id=main_id)
     data_str = json.dumps(output_data, indent=2, sort_keys=True)
     with open(output_fn, "w", encoding="utf-8") as out:
         out.write(f"export const schemas = {data_str}")
     print(f'found {len(schemas)} schema{"" if len(schemas) == 1 else "s"}')
     if main_id:
-        print(f'main = {main_id} includes {len(key_schemas)} total schemas:')
+        print(f"main = {main_id} includes {len(key_schemas)} total schemas:")
     for x in sorted(key_schemas.keys()):
-        print(f'  {x}')
+        print(f"  {x}")
 
 
 def find_refs_in_schema(x):
@@ -72,6 +73,10 @@ def find_refs_in_schema(x):
         ret |= find_refs_in_schema(x["items"])
     elif x.get("$ref"):
         ret.add(x.get("$ref"))
+
+    for value in x.get("anyOf", []):
+        ret |= find_refs_in_schema(value)
+
     return ret
 
 
