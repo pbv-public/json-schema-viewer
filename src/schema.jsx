@@ -70,6 +70,14 @@ export function JSONSchemaViewer () {
   }
   for (const curPiece of pathKeys) {
     goPastArraysAndMaps()
+
+    if (at.anyOf) {
+      const idx = at.anyOf.findIndex((x) => x?.properties?.[curPiece] !== undefined)
+      if (idx !== -1) {
+        at = at.anyOf[idx]
+      }
+    }
+
     at = at.properties[curPiece]
     const curTypeInfo = getTypeInfo(at, curPiece)
     pathNames.push(curPiece ?? curTypeInfo.typeName)
